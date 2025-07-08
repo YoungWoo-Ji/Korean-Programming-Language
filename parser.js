@@ -20,7 +20,7 @@ function parser(tokens) {
   function parsePrimary(){
     const token = next()
 
-    if(['문자열','식별자','숫자','자료형변환'].includes(token.type)) {
+    if(['문자열','식별자','숫자','논리값'].includes(token.type)) {
       return { type: token.type, value: token.value, line: token.line }
     }
 
@@ -33,7 +33,7 @@ function parser(tokens) {
 
     while (true) {
       const token = now()
-      if (!token || token.type !== '산술연산자') break
+      if (!token || token.type !== '이항연산자') break
 
       const tokenPriority = priority[token.value]
       if (tokenPriority < precedene) break
@@ -42,7 +42,7 @@ function parser(tokens) {
       const right = parseExpression(tokenPriority + 1)
 
       left = {
-        type: '사칙연산',
+        type: '이항연산',
         operator: operator.value, 
         left, right,
         line: operator.line
@@ -85,6 +85,35 @@ function parser(tokens) {
         name:identifier.value,
         value,
         line:identifier.line
+      })
+
+    }
+    
+    // 조건문
+    else if(token.type === '키워드' && token.value === '만약'){
+      const keyWord = next()
+      const test = parseExpression()
+      const thenToken = next()
+      if(thenToken.type !== '키워드' || thenToken.value !== '이면'){
+        throw new Error(`'만약' 키워드 뒤에 '이면' 키워드가 필요합니다 (줄 ${keyWord.line})`)
+      }
+      
+      let consequent = []
+      
+      while(now()&&!(now().type === '키워드'&&now().value==='끝')){
+        consequent.push(next())
+      }
+      if(!now()||now().value!=='끝'){
+        throw new Error(`조건문이 '끝' 키워드로 닫히지 않았습니다 (줄 ${thenToken.line})`)
+      }
+      next() // 키워드 '끝'
+
+      consequent = parser(consequent)
+      
+      ast.push({
+        type:'조건문',
+        test,
+        consequent
       })
 
     }

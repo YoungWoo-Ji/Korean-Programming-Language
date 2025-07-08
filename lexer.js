@@ -53,7 +53,7 @@ function classifyToken(input,line){
       }
       
     // 키워드
-    }else if(['변수','출력','입력'].includes(word)){
+    }else if(['변수','출력','입력','만약','이면','끝'].includes(word)){
       tokens.push({type:'키워드',value:word, line})
 
     // 자료형변환
@@ -65,8 +65,8 @@ function classifyToken(input,line){
       tokens.push({type:'대입연산자',value:word, line})
 
     // 산술 연산자
-    }else if(['+','-','*','/'].includes(word)){
-      tokens.push({type:'산술연산자',value:word, line})
+    }else if(['+','-','*','/','>','<','>=','<=','==','!=','===','!=='].includes(word)){
+      tokens.push({type:'이항연산자',value:word, line})
 
     // 숫자
     }else if(!isNaN(word)){

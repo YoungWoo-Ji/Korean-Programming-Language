@@ -18,11 +18,19 @@ function interpreter(ast,input) {
         env[node.name] = evalNode(node.value)
         return
 
+      case '조건문':
+        if(evalNode(node.test)){
+          for (const node2 of node.consequent){
+            evalNode(node2)
+          }
+        }
+        return
+        
       case '숫자변환':
         const value = evalNode(node.value)
         return Number(value)
 
-      case '사칙연산':
+      case '이항연산':
         const left = evalNode(node.left)
         const right = evalNode(node.right)
         switch (node.operator) {
@@ -30,6 +38,14 @@ function interpreter(ast,input) {
           case '-': return left - right
           case '*': return left * right
           case '/': return left / right
+          case '>': return left > right
+          case '<': return left < right
+          case '>=': return left >= right
+          case '<=': return left <= right
+          case '==': return left == right
+          case '!=': return left != right
+          case '===': return left === right
+          case '!==': return left !== right
         }
         break
       
@@ -68,6 +84,9 @@ function interpreter(ast,input) {
         return node.value
 
       case '문자열':
+        return node.value
+
+      case '논리값':
         return node.value
 
       case 'undefined':
