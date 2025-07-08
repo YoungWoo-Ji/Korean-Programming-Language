@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국어 프로그래밍 언어 IDE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            font-size: 1.2em;
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            background: white;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .run-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .run-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .run-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .run-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .run-button:active {
+            transform: translateY(0);
+        }
+
+        .run-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .output-display {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #1a1a1a;
+            color: #00ff00;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .clear-button {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .clear-button:hover {
+            background: #ff5252;
+            transform: translateY(-1px);
+        }
+
+        .example-code {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .collapsible-section {
+            margin-top: 20px;
+        }
+
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .collapsible-header:hover {
+            color: #667eea;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>한국어 프로그래밍 언어 IDE</h1>
+            <p>프로그래밍 언어를 실행해보세요</p>
+        </div>
+
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="section-title">코드 에디터</div>
+                <textarea class="code-editor" id="codeEditor" placeholder="여기에 코드를 입력하세요..."></textarea>
+
+                <div class="input-section">
+                    <div class="section-title">입력 데이터</div>
+                    <textarea class="input-field" id="inputField" placeholder="프로그램에서 사용할 입력값들을 줄바꿈으로 구분하여 입력하세요..."></textarea>
+                </div>
+
+                <div class="controls">
+                    <button class="run-button" onclick="runCode()">
+                        <span>▶️ 실행</span>
+                    </button>
+                    <button class="clear-button" onclick="clearAll()">초기화</button>
+                </div>
+
+                <div class="example-code">
+                    <strong>예시 명령어:</strong><br>
+                    출력 [메시지] - 출력<br>
+                    변수 [변수] ([은/는] [값]) - 변수 선언<br>
+                    [변수] [은/는] [값] - 변수 대입<br>
+                    입력 [자료형] [변수] - 입력<br>
+                    IF [조건] THEN ... END - 조건문<br>
+                    LOOP [횟수] ... END - 반복문
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="section-title">출력</div>
+                <div class="output-display" id="outputDisplay">출력 결과가 여기에 표시됩니다...</div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="section-title collapsible-header" onclick="toggleSection('collapsibleContent1','toggleIcon1')">
+                    토큰화
+                    <span class="toggle-icon" id="toggleIcon1">▼</span>
+                </div>
+                <div class="collapsible-content" id="collapsibleContent1">
+                    <div class="output-display" id="tokenDisplay">토큰 정보가 여기에 표시됩니다...</div>
+                </div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="section-title collapsible-header" onclick="toggleSection('collapsibleContent2','toggleIcon2')">
+                    AST
+                    <span class="toggle-icon" id="toggleIcon2">▼</span>
+                </div>
+                <div class="collapsible-content" id="collapsibleContent2">
+                    <div class="output-display" id="astDisplay">ast 정보가 여기에 표시됩니다...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="lexer.js"></script>
+    <script type="text/javascript" src="parser.js"></script>
+    <script type="text/javascript" src="interpreter.js"></script>
+
+    <script>
+        let output = ''
+
+        function runCode() {
+            const code = document.getElementById('codeEditor').value
+            const input = document.getElementById('inputField').value
+            
+            let tokens,ast,output 
+            try{
+                tokens = tokenizer(code)
+                ast = parser(tokens)
+                output = interpreter(ast,input)
+
+                document.getElementById('tokenDisplay').textContent = JSON.stringify(tokens,null,3)
+                document.getElementById('astDisplay').textContent = JSON.stringify(ast,null,3)
+                document.getElementById('outputDisplay').textContent = output.outputs.join("\n")
+            }catch(e){
+                document.getElementById('outputDisplay').textContent = `⚠️오류: ${e.message}`
+            }
+        }
+
+        function toggleSection(contentId,iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('codeEditor').value = ''
+            document.getElementById('inputField').value = ''
+            document.getElementById('outputDisplay').textContent = '프로그램 실행 결과가 여기에 표시됩니다...'
+            output = ''
+        }
+
+        // 코드 에디터에서 Tab 키 지원
+        document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+    </script>
+</body>
+</html>
