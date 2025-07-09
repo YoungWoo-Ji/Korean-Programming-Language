@@ -170,6 +170,10 @@ function parser(tokens) {
         line: identifier.line
       })
     }
+
+    else{
+      throw new Error(`알 수 없는 토큰이 입력되었습니다 (줄 ${token.line})`)
+    }
   }
 
   return ast
